@@ -1,8 +1,10 @@
 export type Produto = {
   id: string;
   nome: string;
+  descricao: string;
   precoCentavos: number;
   estoque: number;
+  imgUrl: string;
 };
 
 export type ItemCarrinho = {
