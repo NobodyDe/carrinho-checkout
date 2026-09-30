@@ -1,4 +1,10 @@
+import { useEffect, useState } from "react";
 import { CATALOGO } from "../constants/dados";
+import Cards from "./common/Cards";
+import ShippingCar from "./ShippingCar";
+import type { Produto } from "../types/props";
+import Header from "./Header";
+import { useCartActions, type NewProductProps } from "./hooks/useCartActions";
 
 function CatalogHeader() {
   return (
@@ -14,13 +20,29 @@ function CatalogHeader() {
 }
 
 export default function Catalog() {
+  const [shoppingCart, setShippingCart] = useState<NewProductProps[]>([]);
+  const [cartOpen, setCartOpen] = useState<boolean>(false);
+  const { removeProduct, changeQuantity, handleNewShippingCarList } =
+    useCartActions(setShippingCart);
+
   return (
-    <main>
+    <main className="flex flex-col gap-4">
+      <Header cart={shoppingCart} setCartOpen={setCartOpen} />
       <CatalogHeader />
-      <div>
-        <div className="bg-card max-w-2xs p-4 rounded-lg">
-          <div className="bg-card-foreground rounded-lg">oi</div>
-        </div>
+      <div className="flex">
+        <Cards
+          shoppingCart={shoppingCart}
+          catalogo={CATALOGO}
+          sendProduct={handleNewShippingCarList}
+          setCartOpen={setCartOpen}
+        />
+        <ShippingCar
+          cartOpen={cartOpen}
+          setCartOpen={setCartOpen}
+          shoppingCart={shoppingCart}
+          onRemove={removeProduct}
+          onChange={changeQuantity}
+        />
       </div>
     </main>
   );
