@@ -1,35 +1,43 @@
 import formatValue from "../../utils/formartValue";
 
-const values = [
-  { label: "Subtotal", value: 0 },
-  { label: "Desconto", value: 0 },
-  { label: "Frete", value: 0 },
-  { label: "Total", value: 0 },
-];
+interface TotalProps {
+  subtotal: number;
+  desconto: number;
+  frete?: number;
+}
 
-export default function Total() {
+export default function Total({ subtotal, desconto }: TotalProps) {
+  const total = subtotal - desconto;
+
+  const items = [
+    { label: "Subtotal", value: subtotal },
+    { label: "Desconto", value: desconto },
+    { label: "Frete", value: 0 },
+    { label: "Total", value: total },
+  ];
+
   return (
     <main className="w-full">
       <div className="flex flex-col gap-2">
-        {values.map((v) => (
+        {items.map((i) => (
           <div
             className={
-              v.label === "Total"
+              i.label === "Total"
                 ? "flex justify-between mt-2"
                 : "flex justify-between "
             }
           >
             <span
               className={
-                v.label === "Total"
+                i.label === "Total"
                   ? "text-lg"
                   : "text-sm text-muted-foreground"
               }
             >
-              {v.label}
+              {i.label}
             </span>
-            <span className={v.label === "Total" ? "text-lg" : "text-sm "}>
-              {formatValue(v.value)}
+            <span className={i.label === "Total" ? "text-lg" : "text-sm "}>
+              {formatValue(i.value)}
             </span>
           </div>
         ))}

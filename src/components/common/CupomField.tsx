@@ -1,27 +1,29 @@
-import { useState } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { CUPONS } from "../../constants/dados";
-import { calculateCupom } from "../../utils/calculateCupom";
+import { validateCupom } from "../../utils/calculateCupom";
 import type { Cupom } from "../../types/props";
 import describeCupom from "../../utils/describeCupom";
 
 interface CupomProps {
   total: number;
+  onApply: (cupom: Cupom | null) => Dispatch<SetStateAction<Cupom | null>>;
+  cupomAtivo: Cupom | null;
 }
 
 export default function CupomField({ total, onApply }: CupomProps) {
   const [cupom, setCupom] = useState<string>("");
   const [cupomAtivo, setCupomAtivo] = useState<Cupom | null>(null);
   const [err, setErr] = useState<string>("");
-  const [displayCupom, setDisplayCupm] = useState<string>("");
+  const [displayCupom, setDisplayCupom] = useState<string>("");
   function handleCupom() {
-    if (!cupom) return setErr("Digite um cupom");
+    if (!cupom.trim()) return setErr("Digite um cupom");
     if (cupomAtivo)
       return setErr("Já existe um cupom aplicado. Remova-o antes.");
-    const result = calculateCupom(cupom, total);
+    const result = validateCupom(cupom, total);
     if (!result.ok) return setErr(result.erro);
     setErr("");
-    onApply(result);
     setCupomAtivo(result.cupom);
+    onApply(result.cupom);
   }
 
   function handleRemoverCupom() {

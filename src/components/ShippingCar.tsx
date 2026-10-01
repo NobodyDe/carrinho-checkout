@@ -5,6 +5,8 @@ import ProductInCart from "./common/ProductInCart";
 import FreeShippingBar from "./common/freeShippingBar";
 import CupomField from "./common/CupomField";
 import Total from "./common/Total";
+import type { Cupom } from "../types/props";
+import { calcularDesconto } from "../utils/calculateCupom";
 
 interface ShippingCarProps {
   shoppingCart: NewProductProps[];
@@ -20,10 +22,20 @@ export default function ShippingCar({
   onRemove,
   onChange,
 }: ShippingCarProps) {
+  const [cupomAtivo, setCupomAtivo] = useState<Cupom | null>(null);
+  console.log(cupomAtivo);
+
   const total = shoppingCart.reduce(
     (acc, p) => acc + p.precoCentavos * p.Quantidade,
     0,
   );
+  const subtotal = shoppingCart.reduce(
+    (soma, p) => soma + p.precoCentavos * p.Quantidade,
+    0,
+  );
+
+  const desconto = cupomAtivo ? calcularDesconto(cupomAtivo, subtotal) : 0;
+
   return (
     <aside
       className={`flex flex-col max-w-[25rem] gap-4 w-full bg-foreground rounded-lg p-5.5 border border-border ${cartOpen ? "flex" : "hidden"}`}
@@ -49,8 +61,8 @@ export default function ShippingCar({
         )}
 
         <FreeShippingBar total={total} />
-        <CupomField onApply total={total} />
-        <Total />
+        <CupomField onApply={setCupomAtivo} total={total} />
+        <Total subtotal={subtotal} desconto={desconto} />
       </main>
     </aside>
   );
