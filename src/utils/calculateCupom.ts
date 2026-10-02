@@ -15,6 +15,10 @@ export function calcularDesconto(cupom: Cupom, total: number): number {
   return Math.min(desconto, total); // nunca deixa o total negativo
 }
 
+export function atingeMinimo(cupom: Cupom, subtotal: number) {
+  return subtotal >= cupom.minimoCentavos;
+}
+
 export function validateCupom(
   codigoDigitado: string,
   subtotal: number,
@@ -23,7 +27,7 @@ export function validateCupom(
   const cupom = CUPONS.find((c) => c.codigo === codigo);
 
   if (!cupom) return { ok: false, erro: "Cupom inexistente" };
-  if (subtotal < cupom.minimoCentavos)
+  if (!atingeMinimo(cupom, subtotal))
     return {
       ok: false,
       erro: `Compra mínima de ${formatValue(cupom.minimoCentavos)}.`,

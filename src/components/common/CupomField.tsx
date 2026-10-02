@@ -1,6 +1,6 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { CUPONS } from "../../constants/dados";
-import { validateCupom } from "../../utils/calculateCupom";
+import { atingeMinimo, validateCupom } from "../../utils/calculateCupom";
 import type { Cupom } from "../../types/props";
 import describeCupom from "../../utils/describeCupom";
 
@@ -10,11 +10,10 @@ interface CupomProps {
   cupomAtivo: Cupom | null;
 }
 
-export default function CupomField({ total, onApply }: CupomProps) {
+export default function CupomField({ total, cupomAtivo, onApply }: CupomProps) {
   const [cupom, setCupom] = useState<string>("");
-  const [cupomAtivo, setCupomAtivo] = useState<Cupom | null>(null);
   const [err, setErr] = useState<string>("");
-  const [displayCupom, setDisplayCupom] = useState<string>("");
+
   function handleCupom() {
     if (!cupom.trim()) return setErr("Digite um cupom");
     if (cupomAtivo)
@@ -22,12 +21,10 @@ export default function CupomField({ total, onApply }: CupomProps) {
     const result = validateCupom(cupom, total);
     if (!result.ok) return setErr(result.erro);
     setErr("");
-    setCupomAtivo(result.cupom);
     onApply(result.cupom);
   }
 
   function handleRemoverCupom() {
-    setCupomAtivo(null);
     setCupom("");
     setErr("");
     onApply(null);

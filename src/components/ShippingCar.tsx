@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { NewProductProps } from "./Catalog";
 import EmptyCart from "./common/EmptyCart";
 import ProductInCart from "./common/ProductInCart";
@@ -6,7 +6,7 @@ import FreeShippingBar from "./common/freeShippingBar";
 import CupomField from "./common/CupomField";
 import Total from "./common/Total";
 import type { Cupom } from "../types/props";
-import { calcularDesconto } from "../utils/calculateCupom";
+import { atingeMinimo, calcularDesconto } from "../utils/calculateCupom";
 
 interface ShippingCarProps {
   shoppingCart: NewProductProps[];
@@ -18,12 +18,10 @@ interface ShippingCarProps {
 export default function ShippingCar({
   shoppingCart,
   cartOpen,
-  setCartOpen,
   onRemove,
   onChange,
 }: ShippingCarProps) {
   const [cupomAtivo, setCupomAtivo] = useState<Cupom | null>(null);
-  console.log(cupomAtivo);
 
   const total = shoppingCart.reduce(
     (acc, p) => acc + p.precoCentavos * p.Quantidade,
@@ -33,8 +31,12 @@ export default function ShippingCar({
     (soma, p) => soma + p.precoCentavos * p.Quantidade,
     0,
   );
+  const copumValido = cupomAtivo !== null && atingeMinimo(cupomAtivo, subtotal);
+  const desconto = copumValido ? calcularDesconto(cupomAtivo, subtotal) : 0;
 
-  const desconto = cupomAtivo ? calcularDesconto(cupomAtivo, subtotal) : 0;
+  useEffect(() => {
+    if (cupomAtivo && !atingeMinimo(cupomAtivo, subtotal)) setCupomAtivo(null);
+  }, [cupomAtivo, subtotal]);
 
   return (
     <aside
@@ -61,7 +63,11 @@ export default function ShippingCar({
         )}
 
         <FreeShippingBar total={total} />
-        <CupomField onApply={setCupomAtivo} total={total} />
+        <CupomField
+          onApply={setCupomAtivo}
+          cupomAtivo={cupomAtivo}
+          total={total}
+        />
         <Total subtotal={subtotal} desconto={desconto} />
       </main>
     </aside>
